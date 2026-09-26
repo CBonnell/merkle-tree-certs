@@ -428,7 +428,7 @@ func TrustAnchorIDToPattern(id TrustAnchorID) TrustAnchorIDPattern {
 		if !ok {
 			panic(fmt.Sprintf("invalid pattern %x", []byte(id)))
 		}
-		pattern = appendBase128(pattern, v)
+		pattern = appendPatternRange(pattern, v, v)
 	}
 	return pattern
 }
