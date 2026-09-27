@@ -76,7 +76,7 @@ func TestTrustAnchorIDToPattern(t *testing.T) {
 	id := TrustAnchorID{0x81, 0xfd, 0x59, 0x01}
 	pattern := TrustAnchorIDToPattern(id)
 	expected := TrustAnchorIDPattern{0x81, 0xfd, 0x59, 0x81, 0xfd, 0x59, 0x01, 0x01}
-	if !bytes.Equal(id, pattern) {
+	if !bytes.Equal(expected, pattern) {
 		t.Errorf("TrustAnchorIDToPattern(%s) was %s, wanted %s", id, pattern, expected)
 	}
 }
