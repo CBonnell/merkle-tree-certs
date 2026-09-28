@@ -1145,7 +1145,7 @@ This is equivalent to the concatenation of:
 
 For example, the trust anchor ID 32473.1 would be encoded as the ASCII string `oid/1.3.6.1.4.1.32473.1`.
 
-{{Section 4 of !I-D.ietf-tls-trust-anchor-ids}} limits OID components in trust anchor ID, such that the above value fits in 2<sup>8</sup>-1 bytes. However, a general RELATIVE-OID can be arbitrarily long, with arbitrarily large components. Implementations that do not validate these bounds earlier MUST fail signature generation or verification if `cosigner_name` or `log_origin` would be too long. Implementations MAY accept larger OID components than allowed in trust anchor IDs, but MUST support OID components up to at least 2<sup>63</sup>-1 and MUST fail signature generation or verification if conversion to dotted decimal overflows any implementation limit.
+OID components in a trust anchor ID can be arbitrarily large. Implementations MAY set an upper bound on supported OID components, based on the guidance in {{Section 8 of !I-D.ietf-tls-trust-anchor-ids}}. Such implementations MUST fail signature generation or verification if an OID component is out of range.
 
 `start` and `end` MUST define a valid subtree of the log, and `subtree_hash` MUST be the subtree's hash value in the cosigner's view of the log. See {{definition-of-a-subtree}}.
 
@@ -1453,7 +1453,7 @@ In order to accept certificates from a Merkle Tree CA, a relying party MUST be c
 
 This information may be obtained from a CA certificate structure, defined in {{representing-certification-authorities}}:
 
-* The CA ID is determined from the certificate's subject.
+* The CA ID is determined from the certificate's subject. Note that, while a general RELATIVE-OID can be arbitrarily long, {{Section 4 of !I-D.ietf-tls-trust-anchor-ids}} limits trust anchor IDs to 32 bytes.
 
 * The log hash algorithm is determined from the type of the Merkle Tree CA extension.
 
