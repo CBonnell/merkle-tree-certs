@@ -1391,7 +1391,7 @@ The following format can be used to represent a CA's active landmarks. The forma
 
 * A header line consisting of a decimal integer, `latest_landmark`, with the landmark number of the CA's most recent landmark at the time of publishing. This value MUST be at most 2<sup>48</sup>-1.
 
-* A sequence of `num_active_landmarks + 1` lines, where `num_active_landmarks` is the number of active landmarks at the time of publishing. Decoders MUST reject documents where there are greater than `latest_landmark` such lines. Numbered consecutively from zero, line `i` in this sequence consists of:
+* A sequence of `num_active_landmarks + 1` lines, where `num_active_landmarks` is the number of active landmarks at the time of publishing. Decoders MUST reject documents where there are greater than `latest_landmark + 1` such lines. Numbered consecutively from zero, line `i` in this sequence consists of:
 
   * The tree size for landmark `latest_landmark - i` as a decimal integer. This value MUST be at most 2<sup>48</sup>-1.
   * A single space character (U+0020).
