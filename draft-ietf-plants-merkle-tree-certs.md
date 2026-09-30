@@ -973,7 +973,7 @@ Once allocated, the ID's entire object identifier (OID) arc is reserved by this 
 
 * For each positive integer `N` and `L`, the OID `{caID landmarkGroups(2) N L}` represents a trust anchor group ({{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}) containing landmark `L` of log `N` and earlier landmarks of that log, as defined in {{single-log-landmark-groups}}. These OIDs may be used to advertise a series of landmarks at once.
 
-Future extensions to this protocol MAY define further allocations.
+Future extensions to this protocol MAY define further allocations by adding to the registry defined in {{mtc-ca-identifier-child-components}}.
 
 A CA ID determines a PKIX distinguished name ({{Section 4.1.2.4 of !RFC5280}}) that can be used in the issuer or subject field of an X.509 TBSCertificate. This distinguished name has a single relative distinguished name, which has a single attribute. The attribute has type `id-rdna-trustAnchorID`, defined below:
 
@@ -1082,7 +1082,7 @@ The fields of a TBSCertificateLogEntry are defined as follows:
 
 Note the subject's public key algorithm is incorporated into both `subjectPublicKeyAlgorithm` and `subjectPublicKeyInfoHash`.
 
-MTCLogEntry is an extensible structure. Future documents MAY define new values for MTCLogEntryType or MTCLogEntryExtensionType, with corresponding semantics. See {{certification-authority-cosigners}} and {{extensibility}} for additional discussion.
+MTCLogEntry is an extensible structure. Future documents MAY define new values for MTCLogEntryType or MTCLogEntryExtensionType by adding to the registries defined in {{mtc-log-entry-types}} and {{mtc-log-entry-extension-types}}, respectively. See {{certification-authority-cosigners}} and {{extensibility}} for additional discussion.
 
 An MTCLogEntry's size MUST NOT exceed 65535 (2<sup>16</sup>-1) bytes. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.
 
@@ -1959,7 +1959,9 @@ It is not sufficient to constrain the MTC CA with a path length constraint ({{Se
 
 # IANA Considerations
 
-## Module Identifier
+## Additions to Existing Registries
+
+### Module Identifier
 
 IANA is requested to add the following entry in the "SMI Security for PKIX Module Identifier" registry {{?RFC7299}}:
 
@@ -1967,7 +1969,7 @@ IANA is requested to add the following entry in the "SMI Security for PKIX Modul
 |---------|-----------------|------------|
 | TBD     | id-mod-mtc-2025 | [this-RFC] |
 
-## Algorithm
+### Algorithm
 
 IANA is requested to add the following entry to the "SMI Security for PKIX Algorithms" registry {{?RFC7299}}:
 
@@ -1975,7 +1977,7 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Algor
 |---------|-----------------|------------|
 | TBD     | id-alg-mtcProof | [this-RFC] |
 
-## Certificate Extension
+### Certificate Extension
 
 IANA is requested to add the following entry to the "SMI Security for PKIX Certificate Extension" registry {{?RFC7299}}:
 
@@ -1983,7 +1985,7 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Certi
 |---------|----------------------------------------|------------|
 | TBD     | id-pe-mtcCertificationAuthority-SHA256 | [this-RFC] |
 
-## Relative Distinguished Name Attribute
+### Relative Distinguished Name Attribute
 
 IANA is requested to add the following entry to the "SMI Security for PKIX Relative Distinguished Name Attribute" registry {{!RFC9925}}:
 
@@ -1991,7 +1993,7 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Relat
 |---------|-----------------------|------------|
 | TBD     | id-rdna-trustAnchorID | [this-RFC] |
 
-## Link Relation Type
+### Link Relation Type
 
 IANA is requested to add the following entry to the "Link Relation Types" registry {{!RFC8288}}:
 
@@ -2003,6 +2005,58 @@ Description:
 
 Reference:
 : [this-RFC], {{optional-certificates}}
+
+## New Registries
+
+IANA is requested to add a new top-level registry, "Merkle Tree Certificates", to the "Protocol Registries" page at <https://www.iana.org/protocols>
+
+The rest of this section defines the subregistries requested within the new "Merkle Tree Certificates" registry.
+
+### MTC Log Entry Types
+
+IANA is requested to add a new registry, "MTC Log Entry Types" with the
+following registration policies from {{!RFC8126}}:
+
+Range           | Registration Policy
+----------------|----------------------
+0x0000 - 0xEFFF | Specification Required
+0xF000 - 0xFFFF | Private Use
+
+The registry initially consists of:
+
+Value           | Name           | Reference
+----------------|----------------|-----------
+0x0000          | null_entry     | [this-RFC]
+0x0001          | tbs_cert_entry | [this-RFC]
+0x0002 - 0xEFFF | Unassigned     |
+0xF000 - 0xFFFF | Reserved for Private Use | [this-RFC]
+
+### MTC Log Entry Extension Types
+
+IANA is requested to add a new registry, "MTC Log Entry Extension Types" with the
+following registration policies from {{!RFC8126}}:
+
+Range           | Registration Policy
+----------------|----------------------
+0x0000 - 0xEFFF | Specification Required
+0xF000 - 0xFFFF | Private Use
+
+The registry initially consists of:
+
+Value           | Name           | Reference
+----------------|----------------|-----------
+0x0000 - 0xEFFF | Unassigned     |
+0xF000 - 0xFFFF | Reserved for Private Use | [this-RFC]
+
+### MTC CA Identifier Child Components
+
+IANA is requested to add a new registry, "MTC CA Identifier Child Components", whose registration policy is Specification Required {{!RFC8126}}. Values shall be any non-negative integer. The registry initially consists of:
+
+Value | Name           | Reference
+------|----------------|-----------
+0     | logs           | [this-RFC]
+1     | landmarks      | [this-RFC]
+2     | landmarkGroups | [this-RFC]
 
 --- back
 
@@ -2844,3 +2898,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 {:numbered="false"}
 
 - Bump the experimental OID for id-alg-mtcProof, to reflect the format change.
+
+- Set up registries for extensible parameters
