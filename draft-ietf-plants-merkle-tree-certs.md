@@ -222,7 +222,7 @@ This document describes Merkle Tree certificates, a new form of X.509 certificat
 
 In Public Key Infrastructures (PKIs) that use Certificate Transparency (CT) {{?RFC6962}} for a public logging requirement, an authenticating party must present Signed Certificate Timestamps (SCTs) alongside certificates. CT policies often require two or more SCTs per certificate {{APPLE-CT}} {{CHROME-CT}}, each of which carries a signature. These signatures are in addition to those in the certificate chain itself.
 
-Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature {{?RFC8032}}, but post-quantum replacements are much larger. For example, ML-DSA-44 {{?FIPS204=DOI.10.6028/NIST.FIPS.204}} uses 1,312 bytes per public key and 2,420 bytes per signature. ML-DSA-65 uses 1,952 bytes per public key and 3,309 bytes per signature. Even with a directly-trusted intermediate ({{Section 8.5 of ?I-D.ietf-tls-trust-anchor-ids}}), two SCTs and a leaf certificate signature add 7,260 bytes of authentication overhead with ML-DSA-44 and 9,927 bytes with ML-DSA-65.
+Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature {{?RFC8032}}, but post-quantum replacements are much larger. For example, ML-DSA-44 {{?FIPS204=DOI.10.6028/NIST.FIPS.204}} uses 1,312 bytes per public key and 2,420 bytes per signature. ML-DSA-65 uses 1,952 bytes per public key and 3,309 bytes per signature. Even with a directly-trusted intermediate ({{Section 9.5 of ?I-D.ietf-tls-trust-anchor-ids}}), two SCTs and a leaf certificate signature add 7,260 bytes of authentication overhead with ML-DSA-44 and 9,927 bytes with ML-DSA-65.
 
 This increased overhead additionally impacts CT logs themselves. Most of a log's costs scale with the total storage size of the log. Each log entry contains both a public key, and a signature from the CA. With larger public keys and signatures, the size of each log entry will grow.
 
@@ -1136,6 +1136,8 @@ This is equivalent to the concatenation of:
 
 For example, the trust anchor ID 32473.1 would be encoded as the ASCII string `oid/1.3.6.1.4.1.32473.1`.
 
+OID components in a trust anchor ID can be arbitrarily large. Implementations MAY set an upper bound on supported OID components, based on the guidance in {{Section 8 of !I-D.ietf-tls-trust-anchor-ids}}. Such implementations MUST fail signature generation or verification if an OID component is out of range.
+
 `start` and `end` MUST define a valid subtree of the log, and `subtree_hash` MUST be the subtree's hash value in the cosigner's view of the log. See {{definition-of-a-subtree}}.
 
 If `timestamp` is non-zero, it MUST be the time that the signature was produced. This time is represented as seconds since the Epoch, as defined in Section 4.19 of Volume 1 of {{!POSIX=DOI.10.1109/IEEESTD.2024.10555529}}. Additionally, if `timestamp` is non-zero, the following MUST be true:
@@ -1440,7 +1442,7 @@ In order to accept certificates from a Merkle Tree CA, a relying party MUST be c
 
 This information may be obtained from a CA certificate structure, defined in {{representing-certification-authorities}}:
 
-* The CA ID is determined from the certificate's subject.
+* The CA ID is determined from the certificate's subject. Note that, while a general RELATIVE-OID can be arbitrarily long, {{Section 4 of !I-D.ietf-tls-trust-anchor-ids}} limits trust anchor IDs to 32 bytes.
 
 * The log hash algorithm is determined from the type of the Merkle Tree CA extension.
 
@@ -1787,7 +1789,7 @@ If the service is rotating keys in response to a key compromise, this option is 
 
 # Privacy Considerations
 
-The Privacy Considerations described in {{Section 9 of !I-D.ietf-tls-trust-anchor-ids}} apply to their use with Merkle Tree Certificates.
+The Privacy Considerations described in {{Section 10 of !I-D.ietf-tls-trust-anchor-ids}} apply to their use with Merkle Tree Certificates.
 
 In particular, relying parties that share an update process for trusted subtrees ({{trusted-subtrees}}) will fetch the same stream of updates. However, updates may reach different users at different times, resulting in some variation across users. This variation may contribute to a fingerprinting attack {{?RFC6973}}. If the Merkle Tree CA trust anchors are sent unconditionally in `trust_anchors`, this variation will be passively observable. If they are sent conditionally, e.g. gated on the recovery flow, the trust anchor list will require active probing.
 
