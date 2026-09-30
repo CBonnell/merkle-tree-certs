@@ -973,7 +973,7 @@ Once allocated, the ID's entire object identifier (OID) arc is reserved by this 
 
 * For each positive integer `N` and `L`, the OID `{caID landmarkGroups(2) N L}` represents a trust anchor group ({{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}) containing landmark `L` of log `N` and earlier landmarks of that log, as defined in {{single-log-landmark-groups}}. These OIDs may be used to advertise a series of landmarks at once.
 
-Future extensions to this protocol MAY define further allocations by adding to the registry defined in {{ca-identifier-child-components}}.
+Future extensions to this protocol MAY define further allocations by adding to the registry defined in {{mtc-ca-identifier-child-components}}.
 
 A CA ID determines a PKIX distinguished name ({{Section 4.1.2.4 of !RFC5280}}) that can be used in the issuer or subject field of an X.509 TBSCertificate. This distinguished name has a single relative distinguished name, which has a single attribute. The attribute has type `id-rdna-trustAnchorID`, defined below:
 
@@ -1082,7 +1082,7 @@ The fields of a TBSCertificateLogEntry are defined as follows:
 
 Note the subject's public key algorithm is incorporated into both `subjectPublicKeyAlgorithm` and `subjectPublicKeyInfoHash`.
 
-MTCLogEntry is an extensible structure. Future documents MAY define new values for MTCLogEntryType or MTCLogEntryExtensionType by adding to the registries defined in {{log-entry-types}} and {{log-entry-extension-types}}, respectively. See {{certification-authority-cosigners}} and {{extensibility}} for additional discussion.
+MTCLogEntry is an extensible structure. Future documents MAY define new values for MTCLogEntryType or MTCLogEntryExtensionType by adding to the registries defined in {{mtc-log-entry-types}} and {{mtc-log-entry-extension-types}}, respectively. See {{certification-authority-cosigners}} and {{extensibility}} for additional discussion.
 
 An MTCLogEntry's size MUST NOT exceed 65535 (2<sup>16</sup>-1) bytes. TBSCertificateLogEntry does not include signatures and hashes public keys, so post-quantum algorithms do not contribute to this size.
 
@@ -2008,28 +2008,49 @@ Reference:
 
 ## New Registries
 
-IANA is requested to add a new top-level registry, "Merkle Tree Certificates", to "Protocol Registries" page at <https://www.iana.org/protocols>
+IANA is requested to add a new top-level registry, "PKI, Logs, And Tree Signatures", to the "Protocol Registries" page at <https://www.iana.org/protocols>
 
-The rest of this section defines the subregistries requested within the new "Merkle Tree Certificates" registry.
+The rest of this section defines the subregistries requested within the new "PKI, Logs, And Tree Signatures" registry.
 
-### Log Entry Types
+### MTC Log Entry Types
 
-IANA is requested to add a new registry, "Log Entry Types", whose registration policy is Specification Required {{!RFC8126}}. Values shall be in the range 0 to 65536 (2<sup>16</sup>-1). The registry initially consists of:
+IANA is requested to add a new registry, "MTC Log Entry Types" with the
+following registration policies from {{!RFC8126}}:
 
-Value | Name           | Reference
-------|----------------|-----------
-0     | null_entry     | [this-RFC]
-1     | tbs_cert_entry | [this-RFC]
+Range           | Registration Policy
+----------------|----------------------
+0x0000 - 0xEFFF | Specification Required
+0xF000 - 0xFFFF | Private Use
 
-### Log Entry Extension Types
+The registry initially consists of:
 
-IANA is requested to add a new registry, "Log Entry Entension Types", whose registration policy is Specification Required {{!RFC8126}}. Values shall be in the range 0 to 65536 (2<sup>16</sup>-1).
+Value           | Name           | Reference
+----------------|----------------|-----------
+0x0000          | null_entry     | [this-RFC]
+0x0001          | tbs_cert_entry | [this-RFC]
+0x0002 - 0xEFFF | Unassigned     |
+0xF000 - 0xFFFF | Reserved for Private Use | [this-RFC]
 
-The registry is initially empty, but has columns Value, Name, and Reference.
+### MTC Log Entry Extension Types
 
-### CA Identifier Child Components
+IANA is requested to add a new registry, "MTC Log Entry Extension Types" with the
+following registration policies from {{!RFC8126}}:
 
-IANA is requested to add a new registry, "CA Identifier Child Components", whose registration policy is Specification Required {{!RFC8126}}. Values shall be any non-negative integer. The registry initially consists of:
+Range           | Registration Policy
+----------------|----------------------
+0x0000 - 0xEFFF | Specification Required
+0xF000 - 0xFFFF | Private Use
+
+The registry initially consists of:
+
+Value           | Name           | Reference
+----------------|----------------|-----------
+0x0000 - 0xEFFF | Unassigned     |
+0xF000 - 0xFFFF | Reserved for Private Use | [this-RFC]
+
+### MTC CA Identifier Child Components
+
+IANA is requested to add a new registry, "MTC CA Identifier Child Components", whose registration policy is Specification Required {{!RFC8126}}. Values shall be any non-negative integer. The registry initially consists of:
 
 Value | Name           | Reference
 ------|----------------|-----------
