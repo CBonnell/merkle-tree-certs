@@ -1969,7 +1969,7 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Algor
 
 | Decimal | Description     | References |
 |---------|-----------------|------------|
-| 67      | id-alg-mtcProof | [this-RFC] |
+| 67      | id-alg-mtcProof-SHA256 | [this-RFC] |
 
 ### Certificate Extension
 
@@ -2103,12 +2103,12 @@ TBSCertificateLogEntry ::= SEQUENCE {
                                            OPTIONAL
 }
 
-id-alg-mtcProof OBJECT IDENTIFIER ::= {
+id-alg-mtcProof-SHA256 OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
     mechanisms(5) pkix(7) algorithms(6) 67 }
 
-sa-mtcProof SIGNATURE-ALGORITHM ::= {
-    IDENTIFIER id-alg-mtcProof
+sa-mtcProof-SHA256 SIGNATURE-ALGORITHM ::= {
+    IDENTIFIER id-alg-mtcProof-SHA256
     PARAMS ARE absent
 }
 
