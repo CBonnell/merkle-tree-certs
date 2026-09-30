@@ -2898,3 +2898,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 {:numbered="false"}
 
 - Bump the experimental OID for id-alg-mtcProof, to reflect the format change.
+
+- Set up registries for extensible parameters
