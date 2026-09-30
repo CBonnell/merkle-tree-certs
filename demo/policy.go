@@ -97,7 +97,11 @@ func caIDFromX509Name(version DraftVersion, name []byte) (TrustAnchorID, error) 
 		return id, nil
 	}
 
-	attr, err := parseSingleAttributeX509Name(name, oidRDNATrustAnchorIDExperiment2)
+	oid := oidRDNATrustAnchorID
+	if version <= VersionPlants06 {
+		oid = oidRDNATrustAnchorIDExperiment2
+	}
+	attr, err := parseSingleAttributeX509Name(name, oid)
 	if err != nil {
 		return nil, err
 	}
@@ -125,9 +129,11 @@ func (p *Policy) AddCA(ca *x509.Certificate) error {
 		return fmt.Errorf("CA %s already defined", caID)
 	}
 
-	wantOID := oidMTCCAWithSHA256Experiment
+	wantOID := oidMTCCAWithSHA256
 	if p.Version <= VersionPlants05 {
 		wantOID = oidMTCCAExperiment
+	} else if p.Version <= VersionPlants06 {
+		wantOID = oidMTCCAWithSHA256Experiment
 	}
 
 	var caExt *pkix.Extension

@@ -33,7 +33,10 @@ var (
 	oidMTCCAExperiment              = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 2}
 	oidRDNATrustAnchorIDExperiment2 = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 3}
 	oidMTCCAWithSHA256Experiment    = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 4}
-	oidMTCProofExperiment2          = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 5}
+
+	oidMTCCAWithSHA256   = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 1, 38}
+	oidMTCProof          = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 6, 67}
+	oidRDNATrustAnchorID = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 25, 3}
 
 	oidAlgUnsigned  = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 6, 36}
 	oidRDNAUnsigned = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 25, 1}
@@ -69,7 +72,7 @@ func addX509V3Version(b *cryptobyte.Builder) {
 func addMTCProofSigAlg(b *cryptobyte.Builder, version DraftVersion) {
 	b.AddASN1(cbasn1.SEQUENCE, func(alg *cryptobyte.Builder) {
 		if version >= VersionPlants07 {
-			alg.AddASN1ObjectIdentifier(oidMTCProofExperiment2)
+			alg.AddASN1ObjectIdentifier(oidMTCProof)
 		} else {
 			alg.AddASN1ObjectIdentifier(oidMTCProofExperiment1)
 		}
@@ -87,7 +90,11 @@ func addX509Name(b *cryptobyte.Builder, version DraftVersion, id TrustAnchorID) 
 		dn.AddASN1(cbasn1.SET, func(rdn *cryptobyte.Builder) {
 			rdn.AddASN1(cbasn1.SEQUENCE, func(attr *cryptobyte.Builder) {
 				if version >= VersionPlants06 {
-					attr.AddASN1ObjectIdentifier(oidRDNATrustAnchorIDExperiment2)
+					if version >= VersionPlants07 {
+						attr.AddASN1ObjectIdentifier(oidRDNATrustAnchorID)
+					} else {
+						attr.AddASN1ObjectIdentifier(oidRDNATrustAnchorIDExperiment2)
+					}
 					attr.AddASN1(tagRelativeOID, func(val *cryptobyte.Builder) {
 						val.AddBytes(id)
 					})
@@ -238,8 +245,10 @@ func addExtensions(b *cryptobyte.Builder, config *CertConfigBase, mtcCA *mtcCAIn
 				// In plants-05 and earlier, the log hash was separate from the top-level OID.
 				if mtcCA.version <= VersionPlants05 {
 					ext.AddASN1ObjectIdentifier(oidMTCCAExperiment)
-				} else {
+				} else if mtcCA.version <= VersionPlants06 {
 					ext.AddASN1ObjectIdentifier(oidMTCCAWithSHA256Experiment)
+				} else {
+					ext.AddASN1ObjectIdentifier(oidMTCCAWithSHA256)
 				}
 				ext.AddASN1Boolean(true)
 				ext.AddASN1(cbasn1.OCTET_STRING, func(extVal *cryptobyte.Builder) {
