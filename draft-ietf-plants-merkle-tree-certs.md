@@ -1269,21 +1269,23 @@ The TBSCertificate's `serialNumber` is constructed from the zero-based index of 
 
 The TBSCertificate's `subjectPublicKeyInfo` contains the specified public key. Its `algorithm` field MUST match the TBSCertificateLogEntry's `subjectPublicKeyAlgorithm`. Its hash MUST match the TBSCertificateLogEntry's `subjectPublicKeyInfoHash`.
 
-The TBSCertificate's `signature` and the Certificate's `signatureAlgorithm` MUST contain an AlgorithmIdentifier whose `algorithm` is id-alg-mtcProof, defined below, and whose `parameters` is omitted.
+This document defines one signature algorithm, id-alg-mtcProof-SHA256, which indicates that the CA log's hash algorithm `HASH` is SHA-256 {{!SHS}}. Other documents MAY define signature algorithms for other hash functions or new versions of the tree construction.
+
+When `HASH` is SHA-256, the TBSCertificate's `signature` and the Certificate's `signatureAlgorithm` MUST contain an AlgorithmIdentifier whose `algorithm` is id-alg-mtcProof-SHA256, defined below, and whose `parameters` is omitted.
 
 ~~~asn.1
-id-alg-mtcProof OBJECT IDENTIFIER ::= {
+id-alg-mtcProof-SHA256 OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
     mechanisms(5) pkix(7) algorithms(6) 67 }
 ~~~
 
-The `signatureValue` contains an MTCProof structure, defined below using the TLS presentation language ({{Section 3 of !RFC9846}}):
+The `signatureValue` contains an MTCProofSHA256 structure, defined below using the TLS presentation language ({{Section 3 of !RFC9846}}):
 
 ~~~tls-presentation
 /* From Section 4 of draft-ietf-tls-trust-anchor-ids */
 opaque TrustAnchorID<1..2^8-1>;
 
-opaque HashValue[HASH_SIZE];
+opaque HashValue[32];
 
 struct {
     TrustAnchorID cosigner_id;
@@ -1296,7 +1298,7 @@ struct {
     uint48 end;
     HashValue inclusion_proof<0..2^16-1>;
     SubtreeSignature signatures<0..2^24-1>;
-} MTCProof;
+} MTCProofSHA256;
 ~~~
 
 `extensions` MUST contain the log entry's `extensions` value ({{log-entries}}).
@@ -1456,9 +1458,9 @@ This information may be obtained from a CA certificate structure, defined in {{r
 
 When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6.1.3 of !RFC5280}}) whose issuer is a Merkle Tree CA, the relying party performs the following procedure:
 
-1. Check that the TBSCertificate's `signature` field is `id-alg-mtcProof` with omitted parameters. If this check fails, abort this process and fail verification.
+1. Check that the TBSCertificate's `signature` field is an algorithm identifier for an MTC Proof. This document defines `id-alg-mtcProof-SHA256` with omitted parameters; other documents may define additional algorithm identifiers. Check that the `HASH` corresponding to the signature algorithm is the same as the CA log's hash algorithm. If this check fails, abort this process and fail verification.
 
-1. Decode the `signatureValue` as an MTCProof, as described in {{certificate-format}}. If decoding fails, including if `signatureValue` is not a multiple of 8 bits or has extra data after the MTCProof, abort this process and fail verification.
+1. Decode the `signatureValue` according to the algorithm identifier in the TBSCertificate's `signature` field. Signatures of type `id-alg-mtcProof-SHA256` are decoded according to the format described in {{certificate-format}}. Let `MTCProof` be the decoded `signatureValue`. If decoding fails, including if `signatureValue` is not a multiple of 8 bits or has extra data after the `MTCProof`, abort this process and fail verification.
 
 1. Let `serial` be the certificate's serial number. If `serial` is negative or greater than 2<sup>64</sup>-1, abort this process and fail verification.
 
@@ -1480,18 +1482,18 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. Let `entry_hash` be the hash of the entry, `MTH({entry}) = HASH(0x00 || entry)`, as defined in {{Section 2.1.1 of !RFC9162}}.
 
-1. Let `expected_subtree_hash` be the result of evaluating the MTCProof's `inclusion_proof` for entry `index`, with hash `entry_hash`, of the subtree described by the MTCProof's `start` and `end`, following the procedure in {{evaluating-a-subtree-inclusion-proof}}. If evaluation fails, abort this process and fail verification.
+1. Let `expected_subtree_hash` be the result of evaluating the `MTCProof`'s `inclusion_proof` for entry `index`, with hash `entry_hash`, of the subtree described by the MTCProof's `start` and `end`, following the procedure in {{evaluating-a-subtree-inclusion-proof}}. If evaluation fails, abort this process and fail verification.
 
 1. If `log_number`, `start`, and `end` match a trusted subtree ({{trusted-subtrees}}) for the CA, check that `expected_subtree_hash` is equal to the trusted subtree's hash. Return success if it matches and failure if it does not.
 
-1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored.
+1. Otherwise, check that the `MTCProof`'s `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored.
 
    Signatures are verified as described in {{signature-format}}. For each signature verification, the CosignedMessage structure is constructed as follows:
 
    1. Set the CosignedMessage's `cosigner_name` based on the cosigner ID as described in {{signature-format}}.
    1. Set the CosignedMessage's `timestamp` to zero.
    1. Set the CosignedMessage's `log_origin` based on `log_id` as described in {{signature-format}}.
-   1. Set the CosignedMessage's `start` and `end` to the MTCProof's `start` and `end`, respectively.
+   1. Set the CosignedMessage's `start` and `end` to the `MTCProof`'s `start` and `end`, respectively.
    1. Set the CosignedMessage's `subtree_hash` to `expected_subtree_hash`.
 
 This procedure only replaces the signature verification portion of X.509 path validation. The relying party MUST continue to perform other checks, such as checking expiry.
