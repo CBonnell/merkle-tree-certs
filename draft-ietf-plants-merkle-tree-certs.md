@@ -980,19 +980,13 @@ A CA ID determines a PKIX distinguished name ({{Section 4.1.2.4 of !RFC5280}}) t
 ~~~asn.1
 id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(25) TBD }
+    mechanisms(5) pkix(7) rdna(25) 3 }
 ~~~
 
 The attribute's value is a RELATIVE-OID containing the trust anchor ID's ASN.1 representation. For example, the distinguished name for a CA with ID `32473.1` would be represented in syntax of {{?RFC4514}} as:
 
 ~~~
-1.3.6.1.5.5.7.25.TBD=#0d0481fd5901
-~~~
-
-For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.3 instead of `id-rdna-trustAnchorID`. Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for use in this document. For example, the distinguished name for an experimental CA with ID `32473.1` would be represented in syntax of {{?RFC4514}} as:
-
-~~~
-1.3.6.1.4.1.44363.47.3=#0d0481fd5901
+1.3.6.1.5.5.7.25.3=#0d0481fd5901
 ~~~
 
 ## Issuance Logs
@@ -1215,7 +1209,7 @@ This document defines one extension type, id-pe-mtcCertificationAuthority-SHA256
 ~~~asn.1
 id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) pe(1) TBD }
+    mechanisms(5) pkix(7) pe(1) 38 }
 
 ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
     SYNTAX MTCCertificationAuthority
@@ -1235,8 +1229,6 @@ MTCCertificationAuthority ::= SEQUENCE {
     maxSerial INTEGER (mtcMinSerial..mtcMaxSerial)
 }
 ~~~
-
-For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.4 instead of `id-pe-mtcCertificationAuthority-SHA256`. Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for use in this document.
 
 The fields of an MTCCertificationAuthority structure are defined as follows:
 
@@ -1280,10 +1272,8 @@ The TBSCertificate's `signature` and the Certificate's `signatureAlgorithm` MUST
 ~~~asn.1
 id-alg-mtcProof OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) algorithms(6) TBD }
+    mechanisms(5) pkix(7) algorithms(6) 67 }
 ~~~
-
-For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.5 instead of `id-alg-mtcProof`. Cloudflare has kindly donated the 1.3.6.1.4.1.44363.47 OID arc for use in this document.
 
 The `signatureValue` contains an MTCProof structure, defined below using the TLS presentation language ({{Section 3 of !RFC9846}}):
 
@@ -1975,7 +1965,7 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Algor
 
 | Decimal | Description     | References |
 |---------|-----------------|------------|
-| TBD     | id-alg-mtcProof | [this-RFC] |
+| 67      | id-alg-mtcProof | [this-RFC] |
 
 ### Certificate Extension
 
@@ -1983,7 +1973,7 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Certi
 
 | Decimal | Description                            | References |
 |---------|----------------------------------------|------------|
-| TBD     | id-pe-mtcCertificationAuthority-SHA256 | [this-RFC] |
+| 38      | id-pe-mtcCertificationAuthority-SHA256 | [this-RFC] |
 
 ### Relative Distinguished Name Attribute
 
@@ -1991,7 +1981,7 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Relat
 
 | Decimal | Description           | References |
 |---------|-----------------------|------------|
-| TBD     | id-rdna-trustAnchorID | [this-RFC] |
+| 3       | id-rdna-trustAnchorID | [this-RFC] |
 
 ### Link Relation Type
 
@@ -2111,7 +2101,7 @@ TBSCertificateLogEntry ::= SEQUENCE {
 
 id-alg-mtcProof OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) algorithms(6) TBD }
+    mechanisms(5) pkix(7) algorithms(6) 67 }
 
 sa-mtcProof SIGNATURE-ALGORITHM ::= {
     IDENTIFIER id-alg-mtcProof
@@ -2120,7 +2110,7 @@ sa-mtcProof SIGNATURE-ALGORITHM ::= {
 
 id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(25) TBD }
+    mechanisms(5) pkix(7) rdna(25) 3 }
 
 at-trustAnchorID ATTRIBUTE ::= {
     TYPE RELATIVE-OID
@@ -2129,7 +2119,7 @@ at-trustAnchorID ATTRIBUTE ::= {
 
 id-pe-mtcCertificationAuthority-SHA256 OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) pe(1) TBD }
+    mechanisms(5) pkix(7) pe(1) 38 }
 
 ext-mtcCertificationAuthority-SHA256 EXTENSION ::= {
     SYNTAX MTCCertificationAuthority
@@ -2897,6 +2887,6 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 ## Since draft-ietf-plants-merkle-tree-certs-06
 {:numbered="false"}
 
-- Bump the experimental OID for id-alg-mtcProof, to reflect the format change.
+- OIDs have been allocated.
 
 - Set up registries for extensible parameters
